@@ -1,0 +1,17 @@
+#keil files
+**/output/*
+**/Listings/*
+**/_build/*
+**/RTE/*
+
+#eagle files
+*.s#?
+*.b#?
+*.l#?
+*.b$?
+*.s$?
+*.l$?
+
+#Jlink
+*JlinkLog.txt
+*JLinkSettings.ini
