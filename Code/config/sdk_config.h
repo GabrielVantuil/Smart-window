@@ -484,10 +484,10 @@
 
 // </e>
 
-// <q> BLE_TORCH_S_ENABLED  - ble_torch_s - torch Service
+// <q> BLE_MOTOR_S_ENABLED  - ble_motor_s - motor Service
  
-#ifndef BLE_TORCH_S_ENABLED
-#define BLE_TORCH_S_ENABLED 1
+#ifndef BLE_MOTOR_S_ENABLED
+#define BLE_MOTOR_S_ENABLED 1
 #endif
 
 // <e> BLE_NUS_CONFIG_LOG_ENABLED - Enables logging in the module.
@@ -10439,9 +10439,9 @@
 #define PM_BLE_OBSERVER_PRIO 1
 #endif
 
-// <o> NRF_BLE_TORCH_OBSERVER_PRIO
-#ifndef NRF_BLE_TORCH_OBSERVER_PRIO
-#define NRF_BLE_TORCH_OBSERVER_PRIO 1
+// <o> NRF_BLE_MOTOR_OBSERVER_PRIO
+#ifndef NRF_BLE_MOTOR_OBSERVER_PRIO
+#define NRF_BLE_MOTOR_OBSERVER_PRIO 1
 #endif
 
 // </h> 

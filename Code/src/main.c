@@ -32,19 +32,14 @@ static void lfclk_config(void){
   nrf_drv_clock_lfclk_request(NULL);
 }
 
-void motorCtrl(int16_t MA, int16_t MB){
-	nrf_gpio_pin_write(MI_A1_PIN, MA>=1);
-	nrf_gpio_pin_write(MI_A2_PIN, MA<=-1);
-	nrf_gpio_pin_write(MI_B1_PIN, MB>=1);
-	nrf_gpio_pin_write(MI_B2_PIN, MB<=-1);
-	nrf_gpio_pin_write(LED_PIN, (MA!=0)?LED_ON:LED_OFF);
-}
 
 uint16_t getAdc(void){
     nrf_saadc_value_t value;
     APP_ERROR_CHECK(nrf_drv_saadc_sample_convert(0, &value));
     return value;
 }
+
+bool ledValue;
 /**@brief Function for application main entry.
  */
 int main(void){
@@ -76,7 +71,8 @@ int main(void){
 	
 	nrf_gpio_pin_write(LED_PIN, LED_OFF);
 	nrf_gpio_pin_write(SENSORS_PWR_PIN, 1);
-	motorCtrl(0, 0);
+	motorACtrl(0);
+	motorBCtrl(0);
 	
 	nrf_gpio_cfg_input(SW1_PIN, NRF_GPIO_PIN_PULLUP);
 	nrf_gpio_cfg_input(SW2_PIN, NRF_GPIO_PIN_PULLUP);
@@ -110,23 +106,25 @@ int main(void){
 		}
 		
 		if((shunt>100) && (shunt<60000)){
-			motorCtrl(0, 0);
+			motorACtrl(0);
 			nrf_delay_ms(1000);
 			dir=0;
+			motorACtrl(dir);
 		}
 		
 		if(!nrf_gpio_pin_read(SW1_PIN) && !nrf_gpio_pin_read(SW2_PIN)){
 			dir=0;
-			motorCtrl(dir, 0);
+			motorACtrl(dir);
 			nrf_delay_ms(500);
 		}
 		else if(!nrf_gpio_pin_read(SW1_PIN)){
 			dir=1;
+			motorACtrl(dir);
 		}
 		else if(!nrf_gpio_pin_read(SW2_PIN)){
 			dir=-1;
+			motorACtrl(dir);
 		}
-		motorCtrl(dir, 0);
 //		else{
 //			motorCtrl(0, 0);
 //			nrf_gpio_pin_write(LED_PIN, LED_OFF);
@@ -134,7 +132,9 @@ int main(void){
 		nrf_delay_ms(10);
 		nrf_gpio_pin_write(LED_PIN, LED_ON);
 		nrf_delay_us(10);
-		nrf_gpio_pin_write(LED_PIN, LED_OFF);
+		if(!ledValue){
+			nrf_gpio_pin_write(LED_PIN, LED_OFF);
+		}
 		nrf_delay_ms(20);
         //idle_state_handle();
     }

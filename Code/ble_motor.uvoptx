@@ -426,8 +426,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>src\lib\ble_torch_s.c</PathWithFileName>
-      <FilenameWithoutPath>ble_torch_s.c</FilenameWithoutPath>
+      <PathWithFileName>src\lib\ble_motor_s.c</PathWithFileName>
+      <FilenameWithoutPath>ble_motor_s.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -775,7 +775,7 @@
 
   <Group>
     <GroupName>nRF_Libraries</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>

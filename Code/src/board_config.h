@@ -2,7 +2,6 @@
 #define BOARD_CONFIG_H
 
 #define LED_ON	1
-
 #define LED_OFF	0
 
 #define SENSORS_PWR_PIN	01

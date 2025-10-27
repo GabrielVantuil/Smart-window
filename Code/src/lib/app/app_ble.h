@@ -17,7 +17,7 @@
 #include "nrf_log_ctrl.h"
 #include "nrf_log_default_backends.h"
 
-#include "ble_torch_s.h"
+#include "ble_motor_s.h"
 
 #include "nrf_ble_gatt.h"
 #include "nrf_ble_qwr.h"
@@ -26,7 +26,7 @@
 
 #define DEAD_BEEF                       0xDEADBEEF                              /**< Value used as error code on stack dump, can be used to identify stack location on stack unwind. */
 
-BLE_TORCH_S_DEF(m_torch_s);                                                  		/**< Torch Service instance. */
+BLE_MOTOR_S_DEF(m_motor_s);                                                  	/**< Motor Service instance. */
 NRF_BLE_GATT_DEF(m_gatt);                                                       /**< GATT module instance. */
 NRF_BLE_QWR_DEF(m_qwr);                                                         /**< Context for the Queued Write module.*/
 

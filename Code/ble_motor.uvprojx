@@ -415,9 +415,9 @@
               <FilePath>src\lib\parameters.h</FilePath>
             </File>
             <File>
-              <FileName>ble_torch_s.c</FileName>
+              <FileName>ble_motor_s.c</FileName>
               <FileType>1</FileType>
-              <FilePath>src\lib\ble_torch_s.c</FilePath>
+              <FilePath>src\lib\ble_motor_s.c</FilePath>
             </File>
             <File>
               <FileName>utils.h</FileName>
@@ -3624,9 +3624,9 @@
               <FilePath>src\lib\parameters.h</FilePath>
             </File>
             <File>
-              <FileName>ble_torch_s.c</FileName>
+              <FileName>ble_motor_s.c</FileName>
               <FileType>1</FileType>
-              <FilePath>src\lib\ble_torch_s.c</FilePath>
+              <FilePath>src\lib\ble_motor_s.c</FilePath>
             </File>
             <File>
               <FileName>utils.h</FileName>

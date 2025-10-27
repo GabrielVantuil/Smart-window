@@ -8,6 +8,8 @@ APP_PWM_INSTANCE(PWM1,1);
 //APP_PWM_INSTANCE(PWM2,2);
 bool ledPowerLocked;
 
+extern bool ledValue;
+
 void timers_init(void){
     // Initialize timer module, making it use the scheduler
     APP_ERROR_CHECK(app_timer_init());
@@ -24,6 +26,16 @@ void setLedOff(void * p_context){
 	if(ledPowerLocked) return;
 	setLed(LED_OFF);
 }
+void motorACtrl(int16_t duty){
+	nrf_gpio_pin_write(MI_A1_PIN, duty>=1);
+	nrf_gpio_pin_write(MI_A2_PIN, duty<=-1);	
+	ledValue = (duty!=0)?LED_ON:LED_OFF;
+}
+void motorBCtrl(int16_t duty){
+	nrf_gpio_pin_write(MI_B1_PIN, duty>=1);
+	nrf_gpio_pin_write(MI_B2_PIN, duty<=-1);	
+	ledValue = (duty!=0)?LED_ON:LED_OFF;
+}
 void pwm_ready_callback(uint32_t pwm_id){}
 void setLedPwm(uint32_t freqX1000, uint16_t duty){	
 	app_pwm_uninit(&PWM1);
@@ -33,21 +45,27 @@ void setLedPwm(uint32_t freqX1000, uint16_t duty){
 	while (app_pwm_channel_duty_set(&PWM1, 0, 100-duty) == NRF_ERROR_BUSY);
 }
 
-void lock_handler           (uint16_t conn_handle, ble_torch_s_t * p_torch_s, uint8_t lock){
-	ledPowerLocked = lock;
-}
-
-void led_power_handler      (uint16_t conn_handle, ble_torch_s_t * p_torch_s, const uint8_t *params){
-	if(ledPowerLocked) return;
+void set_motor_handler	(uint16_t conn_handle, ble_motor_s_t * p_motor_s, const uint8_t *params){
 	APP_ERROR_CHECK(app_timer_stop(power_off_led_timer_id));
-    setLed(params[0]?LED_ON : LED_OFF);
+	uint32_t freq;
+	int16_t duty = (params[5]<<8) +params[6];
 	uint32_t timeout;
-	ArrayToInt32(params, 1, timeout);
-	if(timeout)	APP_ERROR_CHECK(app_timer_start(power_off_led_timer_id, APP_TIMER_TICKS(timeout), NULL));
+	ArrayToInt32(params, 1, freq);
+	ArrayToInt32(params, 7, timeout);
+	NRF_LOG_INFO("%d", params[0]);
+	NRF_LOG_FLUSH();
+	if(params[0]==1){
+		motorACtrl(duty);
+	}
+	else if(params[0]==2){
+		motorBCtrl(duty);
+	}
+	
+//	if(timeout)	APP_ERROR_CHECK(app_timer_start(power_off_led_timer_id, APP_TIMER_TICKS(timeout), NULL));
 }
 
 
-void led_pwm_handler       	(uint16_t conn_handle, ble_torch_s_t * p_torch_s, const uint8_t *params){
+void set_config_handler	(uint16_t conn_handle, ble_motor_s_t * p_motor_s, const uint8_t *params){
 	if(ledPowerLocked) return;
 	uint32_t freq, duty, timeout;
 	ArrayToInt32(params, 0, freq);

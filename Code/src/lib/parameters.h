@@ -2,7 +2,7 @@
 #define PARAMETERS_H__
 #include "board_config.h"
 
-#define DEVICE_NAME                     "GV Flashlight"                   		/**< Name of device. Will be included in the advertising data. */
+#define DEVICE_NAME                     "GV Window"                   			/**< Name of device. Will be included in the advertising data. */
 
 #define APP_BLE_OBSERVER_PRIO           3                                		/**< Application's BLE observer priority. You shouldn't need to modify this value. */
 #define APP_BLE_CONN_CFG_TAG            1                                		/**< A tag identifying the SoftDevice BLE configuration. */
