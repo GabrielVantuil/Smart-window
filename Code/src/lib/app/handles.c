@@ -9,29 +9,33 @@ APP_PWM_INSTANCE(PWM1,1);
 bool ledPowerLocked;
 
 extern bool ledValue;
+extern int16_t MA_duty;
+extern int16_t MB_duty;
+int16_t scheduledDuty[2];
 
 void timers_init(void){
     // Initialize timer module, making it use the scheduler
     APP_ERROR_CHECK(app_timer_init());
-	APP_ERROR_CHECK(app_timer_create(&power_off_led_timer_id, APP_TIMER_MODE_SINGLE_SHOT, setLedOff));
+	APP_ERROR_CHECK(app_timer_create(&motor_timer_id, APP_TIMER_MODE_SINGLE_SHOT, motorTimer));
 }
 
-void setLed(bool val){
-	app_pwm_uninit(&PWM1);
-	nrf_gpio_cfg_output(MI_A1_PIN);
-    nrf_gpio_pin_write(MI_A1_PIN, val);
+void motorTimer(void * p_context){
+	if((scheduledDuty[0]>>8)!=0x7F) motorACtrl(scheduledDuty[0]);
+	if((scheduledDuty[1]>>8)!=0x7F) motorBCtrl(scheduledDuty[1]);
 }
 
-void setLedOff(void * p_context){
-	if(ledPowerLocked) return;
-	setLed(LED_OFF);
+void motorsCtrl(int16_t dutyA, int16_t dutyB){
+	motorACtrl(dutyA);
+	motorBCtrl(dutyB);
 }
 void motorACtrl(int16_t duty){
+	MA_duty = duty;
 	nrf_gpio_pin_write(MI_A1_PIN, duty>=1);
 	nrf_gpio_pin_write(MI_A2_PIN, duty<=-1);	
 	ledValue = (duty!=0)?LED_ON:LED_OFF;
 }
 void motorBCtrl(int16_t duty){
+	MB_duty = duty;
 	nrf_gpio_pin_write(MI_B1_PIN, duty>=1);
 	nrf_gpio_pin_write(MI_B2_PIN, duty<=-1);	
 	ledValue = (duty!=0)?LED_ON:LED_OFF;
@@ -46,24 +50,18 @@ void setLedPwm(uint32_t freqX1000, uint16_t duty){
 }
 
 void set_motor_handler	(uint16_t conn_handle, ble_motor_s_t * p_motor_s, const uint8_t *params){
-	APP_ERROR_CHECK(app_timer_stop(power_off_led_timer_id));
-	uint32_t freq;
-	int16_t duty = (params[5]<<8) +params[6];
+	APP_ERROR_CHECK(app_timer_stop(motor_timer_id));
 	uint32_t timeout;
-	ArrayToInt32(params, 1, freq);
-	ArrayToInt32(params, 7, timeout);
-	NRF_LOG_INFO("%d", params[0]);
-	NRF_LOG_FLUSH();
-	if(params[0]==1){
-		motorACtrl(duty);
+	ArrayToInt32(params, 6, timeout);
+	if(timeout){
+		scheduledDuty[0] = ((params[0]<<8) +params[1]);
+		scheduledDuty[1] = ((params[2]<<8) +params[3]);
+		APP_ERROR_CHECK(app_timer_start(motor_timer_id, APP_TIMER_TICKS(timeout), NULL));
+		return;
 	}
-	else if(params[0]==2){
-		motorBCtrl(duty);
-	}
-	
-//	if(timeout)	APP_ERROR_CHECK(app_timer_start(power_off_led_timer_id, APP_TIMER_TICKS(timeout), NULL));
+	if(params[0]!=0x7F) motorACtrl((params[0]<<8) + params[1]);
+	if(params[2]!=0x7F) motorBCtrl((params[2]<<8) + params[3]);
 }
-
 
 void set_config_handler	(uint16_t conn_handle, ble_motor_s_t * p_motor_s, const uint8_t *params){
 	if(ledPowerLocked) return;
@@ -71,7 +69,6 @@ void set_config_handler	(uint16_t conn_handle, ble_motor_s_t * p_motor_s, const 
 	ArrayToInt32(params, 0, freq);
 	duty = (params[4]<<8) + params[5];
 	ArrayToInt32(params, 6, timeout);
-	if(timeout)	APP_ERROR_CHECK(app_timer_start(power_off_led_timer_id, APP_TIMER_TICKS(timeout), NULL));
 	setLedPwm(freq, duty);
 }
 void connectionTimeout(void * p_context){

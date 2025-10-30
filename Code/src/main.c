@@ -40,6 +40,9 @@ uint16_t getAdc(void){
 }
 
 bool ledValue;
+int16_t MA_duty;
+int16_t MB_duty;
+
 /**@brief Function for application main entry.
  */
 int main(void){
@@ -99,31 +102,36 @@ int main(void){
     for (;;){
 		uint16_t shunt = getAdc();
 		if(shunt>60000)	idleCount++; 
-		if((idleCount>50) || (shunt < 60000)){
+		if((idleCount>500) || (shunt < 60000)){
 			NRF_LOG_INFO("%d", shunt);
 			NRF_LOG_FLUSH();
 			idleCount = 0;
 		}
 		
 		if((shunt>100) && (shunt<60000)){
-			motorACtrl(0);
-			nrf_delay_ms(1000);
+			nrf_gpio_pin_write(LED_PIN, LED_OFF);
+			motorsCtrl(0, 0);
+			nrf_delay_ms(100);
+			MA_duty *= -1;
+			MB_duty *= -1;
+			motorsCtrl(MA_duty, MB_duty);
+			nrf_delay_ms(900);
 			dir=0;
-			motorACtrl(dir);
+			motorsCtrl(0, 0);
 		}
 		
 		if(!nrf_gpio_pin_read(SW1_PIN) && !nrf_gpio_pin_read(SW2_PIN)){
 			dir=0;
-			motorACtrl(dir);
+			motorsCtrl(dir, dir);
 			nrf_delay_ms(500);
 		}
 		else if(!nrf_gpio_pin_read(SW1_PIN)){
 			dir=1;
-			motorACtrl(dir);
+			motorsCtrl(dir, dir);
 		}
 		else if(!nrf_gpio_pin_read(SW2_PIN)){
 			dir=-1;
-			motorACtrl(dir);
+			motorsCtrl(dir, dir);
 		}
 //		else{
 //			motorCtrl(0, 0);

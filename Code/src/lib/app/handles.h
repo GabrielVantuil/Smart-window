@@ -8,16 +8,16 @@
 #include "app_ble.h"
 #include "nrf_delay.h"
 
-APP_TIMER_DEF(power_off_led_timer_id);
+APP_TIMER_DEF(motor_timer_id);
 
 void timers_init(void);
 void startTimers(void);
-void setLed(bool val);
+void motorTimer(void * p_context);
 void blinkLed(uint8_t led);
+void motorsCtrl(int16_t dutyA, int16_t dutyB);
 void motorACtrl(int16_t duty);
 void motorBCtrl(int16_t duty);
 
-void setLedOff(void * p_context);
 void setLedPwm(uint32_t freqX1000, uint16_t duty);
 void set_motor_handler	(uint16_t conn_handle, ble_motor_s_t * p_motor_s, const uint8_t *params);
 void set_config_handler (uint16_t conn_handle, ble_motor_s_t * p_motor_s, const uint8_t *params);
